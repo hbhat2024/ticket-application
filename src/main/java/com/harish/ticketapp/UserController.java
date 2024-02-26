@@ -14,6 +14,9 @@ public class UserController {
     @DeleteMapping("/users")
     public User removeUser(@RequestParam String userEmailAddress) {
         Ticket ticket = ticketService.getTicketForUser(userEmailAddress);
+        if (ticket == null) {
+            return null;
+        }
         User user = ticket.user();
         ticketService.cancelTicket(ticket.id());
         seatService.makeSeatAvailable(ticket.seat());

@@ -4,7 +4,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class TicketService {
@@ -18,7 +21,7 @@ public class TicketService {
     }
 
     public Ticket getTicketForUser(String userEmailAddress) {
-        return tickets.stream().filter(ticket -> ticket.user().emailAddress().equals(userEmailAddress)).findFirst().orElseGet(null);
+        return tickets.stream().filter(ticket -> ticket.user().emailAddress().equals(userEmailAddress)).map(Optional::ofNullable).findFirst().flatMap(Function.identity()).orElse(null);
     }
 
     public List<SeatAllocation> getSeatAllocation(String section) {
@@ -26,7 +29,7 @@ public class TicketService {
     }
 
     public void cancelTicket(long id) {
-        tickets = tickets.stream().filter(ticket -> ticket.id() != id).toList();
+        tickets = tickets.stream().filter(ticket -> ticket.id() != id).collect(Collectors.toList());
     }
 
     public Ticket modifySeatAllocation(String userEmailAddress, Seat newSeat) {
